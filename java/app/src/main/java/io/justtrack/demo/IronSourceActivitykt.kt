@@ -10,14 +10,14 @@ import io.justtrack.SdkBuilder
 /**
  * This activity demonstrates how to initialize our SDK and integrate it with IronSource.
  */
-class IronSourceActivity : Activity() {
+class IronSourceActivitykt : Activity() {
     private val customUserId: String? = "..your user id"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_ironsource)
 
-        val builder: SdkBuilder = JustTrackSdkBuilder(this, MainActivity.token)
+        val builder: SdkBuilder = JustTrackSdkBuilder(this, MainActivitykt.token)
         if (customUserId != null) {
             // or, if you want to provide your own user id:
             builder.setEnableIronSourceIntegration(true, customUserId)
