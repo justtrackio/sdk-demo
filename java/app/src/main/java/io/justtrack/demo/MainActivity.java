@@ -28,7 +28,7 @@ public class MainActivity extends Activity {
     private static final String TAG = "justtrack demo";
 
     //this token is generated in your application dashboard
-    private final String token = "..your token..";
+    public static final String token = "..your token..";
     private JustTrackSdk sdk;
 
     @Override
