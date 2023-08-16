@@ -46,12 +46,7 @@ public class MainActivity extends Activity {
      */
     public void sendPredefinedEvent(View view) {
         sdk.publishEvent(
-                new UserScreenShowEvent("Main", "MainActivity")
-                        //You can also add additional dimensions in PredefinedEvent as well.
-                        .setDimension1("paid_user")
-                        .setDimension2("...")
-                        .setDimension3("...")
-                        .build()
+                new UserScreenShowEvent("Main", "MainActivity").build()
         );
     }
 
@@ -141,7 +136,6 @@ public class MainActivity extends Activity {
         });
     }
 
-
     public void getTestGroupId(View view) {
         sdk.toPromise(sdk.getTestGroupId(), new Promise<Integer>() {
             @Override
@@ -149,8 +143,7 @@ public class MainActivity extends Activity {
                 if (testGroupId != null) {
                     changeText(
                             (TextView) findViewById(R.id.testGroupIdTextView),
-                            getString(R.string.test_group_id, "" + testGroupId
-                            )
+                            getString(R.string.test_group_id, "" + testGroupId)
                     );
                 }
             }
@@ -188,7 +181,7 @@ public class MainActivity extends Activity {
     private void log(Throwable throwable) {
         runOnUiThread(() -> Toast.makeText(
                 MainActivity.this,
-                "reject ${throwable.message}",
+                "reject " + throwable.getMessage(),
                 Toast.LENGTH_SHORT
         ).show());
         Log.e(TAG, "Got unexpected error", throwable);
