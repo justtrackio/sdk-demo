@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">justtrack Demo</string>
+    <string name="get_user_id">Get Attribution</string>
+    <string name="get_advertiser_id">Get Advertiser Info</string>
+    <string name="get_test_group_id">Get Test Group Id</string>
+    <string name="user_id">User Id: %1$s</string>
+    <string name="campaign_name">Campaign: %1$s</string>
+    <string name="advertiser_id">Advertiser Id: %1$s</string>
+    <string name="tracking_limit">Tracking Limit: %1$s</string>
+    <string name="test_group_id">Test Group: %1$s</string>
+    <string name="send_custom_user_id">Send Custom User Id</string>
+    <string name="send_predefined_event">Send Predefined Event</string>
+    <string name="send_custom_event">Send Custom Event</string>
+    <string name="ad_impression">Ad Impression</string>
+</resources>
