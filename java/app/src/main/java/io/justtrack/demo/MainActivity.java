@@ -91,17 +91,17 @@ public class MainActivity extends Activity {
     }
 
     public void getAdvertiserId(View view) {
-        sdk.toPromise(sdk.getAdvertiserIdInfo(), new Promise<AdvertiserIdInfo>() {
+        sdk.getAdvertiserIdInfo().registerPromiseCallback(new Promise<AdvertiserIdInfo>() {
             @Override
             public void resolve(AdvertiserIdInfo advertiserIdInfo) {
                 if (advertiserIdInfo != null) {
                     String advertiserId = advertiserIdInfo.getAdvertiserId();
                     boolean isLimitedAdTracking = advertiserIdInfo.isLimitedAdTracking();
-                    changeText((TextView) findViewById(R.id.advertiserIdTextView), getString(
+                    changeText(findViewById(R.id.advertiserIdTextView), getString(
                             R.string.advertiser_id,
                             "" + advertiserId
                     ));
-                    changeText((TextView) findViewById(R.id.trackingLimitTextView), getString(
+                    changeText(findViewById(R.id.trackingLimitTextView), getString(
                             R.string.tracking_limit,
                             isLimitedAdTracking ? "true" : "false"
                     ));
@@ -116,14 +116,14 @@ public class MainActivity extends Activity {
     }
 
     public void getAttribution(View view) {
-        sdk.toPromise(sdk.getAttribution(), new Promise<AttributionResponse>() {
+        sdk.getAttribution().registerPromiseCallback(new Promise<AttributionResponse>() {
             @Override
             public void resolve(AttributionResponse response) {
                 String userId = response.getUserId().toString();
-                changeText((TextView) findViewById(R.id.userIdTextView), getString(R.string.user_id, userId));
+                changeText(findViewById(R.id.userIdTextView), getString(R.string.user_id, userId));
 
                 String campaignName = response.getCampaign().getName();
-                changeText((TextView) findViewById(R.id.campaignTextView), getString(
+                changeText(findViewById(R.id.campaignTextView), getString(
                         R.string.campaign_name,
                         campaignName
                 ));
@@ -137,12 +137,12 @@ public class MainActivity extends Activity {
     }
 
     public void getTestGroupId(View view) {
-        sdk.toPromise(sdk.getTestGroupId(), new Promise<Integer>() {
+        sdk.getTestGroupId().registerPromiseCallback(new Promise<Integer>() {
             @Override
             public void resolve(Integer testGroupId) {
                 if (testGroupId != null) {
                     changeText(
-                            (TextView) findViewById(R.id.testGroupIdTextView),
+                            findViewById(R.id.testGroupIdTextView),
                             getString(R.string.test_group_id, "" + testGroupId)
                     );
                 }

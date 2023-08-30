@@ -10,18 +10,14 @@ import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import io.justtrack.AdFormat
-import io.justtrack.AdvertiserIdInfo
-import io.justtrack.AttributionResponse
 import io.justtrack.JustTrackSdk
 import io.justtrack.JustTrackSdkBuilder
 import io.justtrack.Money
-import io.justtrack.Promise
 import io.justtrack.UserEvent
 import io.justtrack.UserScreenShowEvent
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class MainActivity : Activity() {
     private lateinit var sdk: JustTrackSdk
@@ -38,7 +34,7 @@ class MainActivity : Activity() {
      * For detailed descriptions of each event, please refer to our documentation at
      * https://docs.justtrack.io/sdk/predefined-events.
      */
-    fun sendPredefinedEvent(view: View) {
+    fun sendPredefinedEvent(@Suppress("UNUSED_PARAMETER") view: View) {
         sdk.publishEvent(
             UserScreenShowEvent("Main", "MainActivity")
                 //You can also add additional dimensions in PredefinedEvent as well.
@@ -52,11 +48,11 @@ class MainActivity : Activity() {
     /**
      * Here is how you can send your custom event.
      */
-    fun sendCustomEvent(view: View) {
+    fun sendCustomEvent(@Suppress("UNUSED_PARAMETER") view: View) {
         sdk.publishEvent(UserEvent("screen_view_event").build())
     }
 
-    fun forwardAdImpression(view: View) {
+    fun forwardAdImpression(@Suppress("UNUSED_PARAMETER") view: View) {
         sdk.forwardAdImpression(
             AdFormat.Banner,
             "adSdkName",
@@ -74,116 +70,71 @@ class MainActivity : Activity() {
      * If you already have your own assigned unique ID for the user,
      * you can also send us this custom unique ID and we will link it with the user.
      */
-    fun sendCustomUserId(view: View) {
+    fun sendCustomUserId(@Suppress("UNUSED_PARAMETER") view: View) {
         AlertDialog.Builder(this).apply {
             title = "Send Custom User Id"
             val input = EditText(this@MainActivity)
             setView(input)
             setPositiveButton(
                 "Add"
-            ) { p0, p1 ->
+            ) { _, _ ->
                 val customUserId = input.text.toString()
                 sdk.setCustomUserId(customUserId)
             }
         }.create().show()
     }
 
-    fun getAdvertiserId(view: View) {
-        sdk.toPromise(sdk.advertiserIdInfo, object : Promise<AdvertiserIdInfo> {
-            override fun resolve(advertiserIdInfo: AdvertiserIdInfo?) {
-                if (advertiserIdInfo != null) {
-                    val advertiserId = advertiserIdInfo.advertiserId
-                    val isLimitedAdTracking = advertiserIdInfo.isLimitedAdTracking
-                    findViewById<TextView>(R.id.advertiserIdTextView).changeText(
-                        getString(
-                            R.string.advertiser_id,
-                            "" + advertiserId
-                        )
-                    )
-                    findViewById<TextView>(R.id.trackingLimitTextView).changeText(
-                        getString(
-                            R.string.tracking_limit,
-                            if (isLimitedAdTracking) "TRUE" else "FALSE"
-                        )
-                    )
-                }
-            }
-
-            override fun reject(throwable: Throwable) {
-                log(throwable)
-            }
-        })
-    }
-
-    fun getAttribution(view: View) {
-        sdk.toPromise(sdk.attribution, object : Promise<AttributionResponse> {
-            override fun resolve(response: AttributionResponse) {
-                val userId = response.userId.toString()
-                findViewById<TextView>(R.id.userIdTextView).changeText(
-                    getString(R.string.user_id, userId)
+    fun getAdvertiserId(@Suppress("UNUSED_PARAMETER") view: View) {
+        CoroutineScope(Dispatchers.Main).launch {
+            try {
+                val advertiserIdInfo = sdk.advertiserIdInfo.await()
+                val advertiserId = advertiserIdInfo.advertiserId
+                val isLimitedAdTracking = advertiserIdInfo.isLimitedAdTracking
+                findViewById<TextView>(R.id.advertiserIdTextView).text = getString(
+                    R.string.advertiser_id,
+                    "" + advertiserId
                 )
-
-                val campaignName = response.campaign.name
-                findViewById<TextView>(R.id.campaignTextView).changeText(
-                    getString(
-                        R.string.campaign_name,
-                        campaignName
-                    )
+                findViewById<TextView>(R.id.trackingLimitTextView).text = getString(
+                    R.string.tracking_limit,
+                    if (isLimitedAdTracking) "TRUE" else "FALSE"
                 )
-            }
-
-            override fun reject(throwable: Throwable) {
+            } catch (throwable: Throwable) {
                 log(throwable)
-            }
-        })
-
-        //Use this if you are using coroutine.
-        CoroutineScope(Dispatchers.IO).launch {
-            withContext(Dispatchers.IO) {
-                try {
-                    val responseFuture = sdk.attribution.get()
-                    val userId = responseFuture.userId.toString()
-                    findViewById<TextView>(R.id.userIdTextView).changeText(
-                        getString(
-                            R.string.user_id,
-                            userId
-                        )
-                    )
-
-                    val campaignName = responseFuture.campaign.name
-                    findViewById<TextView>(R.id.campaignTextView).changeText(
-                        getString(
-                            R.string.campaign_name,
-                            campaignName
-                        )
-                    )
-                } catch (exception: Exception) {
-                    log(exception)
-                }
             }
         }
-
     }
 
-    fun getTestGroupId(view: View) {
-        sdk.toPromise(sdk.testGroupId, object : Promise<Int> {
-            override fun resolve(testGroupId: Int?) {
-                if (testGroupId != null) {
-                    findViewById<TextView>(R.id.testGroupIdTextView).changeText(
-                        getString(
-                            R.string.test_group_id,
-                            "" + testGroupId.toString()
-                        )
-                    )
+    fun getAttribution(@Suppress("UNUSED_PARAMETER") view: View) {
+        CoroutineScope(Dispatchers.Main).launch {
+            try {
+                val response = sdk.attribution.await()
+                val userId = response.userId.toString()
+                findViewById<TextView>(R.id.userIdTextView).text =
+                    getString(R.string.user_id, userId)
 
-                }
-            }
-
-            override fun reject(throwable: Throwable) {
+                val campaignName = response.campaign.name
+                findViewById<TextView>(R.id.campaignTextView).text = getString(
+                    R.string.campaign_name,
+                    campaignName
+                )
+            } catch (throwable: Throwable) {
                 log(throwable)
             }
-        })
+        }
+    }
 
+    fun getTestGroupId(@Suppress("UNUSED_PARAMETER") view: View) {
+        CoroutineScope(Dispatchers.Main).launch {
+            try {
+                val testGroupId: Int? = sdk.testGroupId.await()
+                findViewById<TextView>(R.id.testGroupIdTextView).text = getString(
+                    R.string.test_group_id,
+                    "" + testGroupId
+                )
+            } catch (throwable: Throwable) {
+                log(throwable)
+            }
+        }
     }
 
     override fun onDestroy() {
@@ -208,21 +159,13 @@ class MainActivity : Activity() {
     }
 
     private fun log(throwable: Throwable) {
-        runOnUiThread {
-            Toast.makeText(
-                this@MainActivity,
-                "reject ${throwable.message}",
-                Toast.LENGTH_SHORT
-            ).show()
-        }
+        Toast.makeText(
+            this@MainActivity,
+            "reject ${throwable.message}",
+            Toast.LENGTH_SHORT
+        ).show()
 
         Log.e(TAG, "Got unexpected error", throwable)
-    }
-
-    fun TextView.changeText(text: String) {
-        runOnUiThread {
-            setText(text)
-        }
     }
 
     companion object {
