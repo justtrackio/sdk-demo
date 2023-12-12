@@ -10,11 +10,12 @@ import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import io.justtrack.AdFormat
+import io.justtrack.AdImpression
+import io.justtrack.JtScreenShowEvent
 import io.justtrack.JustTrackSdk
 import io.justtrack.JustTrackSdkBuilder
 import io.justtrack.Money
 import io.justtrack.UserEvent
-import io.justtrack.UserScreenShowEvent
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -36,12 +37,13 @@ class MainActivity : Activity() {
      */
     fun sendPredefinedEvent(@Suppress("UNUSED_PARAMETER") view: View) {
         sdk.publishEvent(
-            UserScreenShowEvent("Main", "MainActivity")
-                //You can also add additional dimensions in PredefinedEvent as well.
-                .setDimension1("paid_user")
-                .setDimension2("...")
-                .setDimension3("...")
-                .build()
+            JtScreenShowEvent("Main").apply {
+                // You can add up to 10 dimensions per event. The constructor already set the "jt_element_name"
+                // dimension, so you have 9 dimensions you can specify left.
+                addDimension("stage", "1")
+                addDimension("character", "fighter")
+                addDimension("dim", "value")
+            }
         )
     }
 
@@ -49,20 +51,25 @@ class MainActivity : Activity() {
      * Here is how you can send your custom event.
      */
     fun sendCustomEvent(@Suppress("UNUSED_PARAMETER") view: View) {
-        sdk.publishEvent(UserEvent("screen_view_event").build())
+        sdk.publishEvent(UserEvent("screen_view_event").apply {
+            // You can add up to 10 dimensions to one event.
+            addDimension("stage", "1")
+            addDimension("character", "fighter")
+            addDimension("dim", "value")
+        })
     }
 
     fun forwardAdImpression(@Suppress("UNUSED_PARAMETER") view: View) {
         sdk.forwardAdImpression(
-            AdFormat.Banner,
-            "adSdkName",
-            "adNetwork",
-            "placement",
-            "abTesting",
-            "segmentName",
-            "instanceName",
-            "bundleId",
-            Money(10.0, "USD")
+            AdImpression(AdFormat.Banner, "adSdkName").apply {
+                setNetwork("network")
+                setPlacement("placement")
+                setTestGroup("testGroup")
+                setSegmentName("segmentName")
+                setInstanceName("instanceName")
+                setBundleId("bundle.id")
+                setRevenue(Money(10.0, "USD"))
+            }
         )
     }
 

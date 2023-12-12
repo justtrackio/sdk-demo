@@ -44,7 +44,7 @@ dependencies {
     implementation("com.google.android.material:material:1.9.0")
 
     // justtrack-sdk
-    implementation("io.justtrack:justtrack-android-sdk:4.4.1")
+    implementation("io.justtrack:justtrack-android-sdk:4.5.0")
 
     // coroutine-sdk
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")

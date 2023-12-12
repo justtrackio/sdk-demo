@@ -42,7 +42,7 @@ dependencies {
     implementation("com.google.android.material:material:1.9.0")
 
     // justtrack-sdk
-    implementation("io.justtrack:justtrack-android-sdk:4.4.1")
+    implementation("io.justtrack:justtrack-android-sdk:4.5.0")
 
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
