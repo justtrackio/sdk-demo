@@ -1,0 +1,39 @@
+# Xcode
+*.pbxuser
+*.xccheckout
+*.xcscmblueprint
+*.xcuserstate
+*.xcworkspace/
+*.moved-aside
+*.xcuserstate
+DerivedData/
+build/
+
+# CocoaPods
+Pods/
+
+# Swift Package Manager
+.build/
+
+# Objective-C/Swift specific
+*.hmap
+*.ipa
+*.dSYM.zip
+*.dSYM
+
+# Various settings
+*.swp
+*.lock
+*.DS_Store
+*.plist
+
+# Other files and folders
+*.generated.swift
+*.playground
+*.bridgesupport
+build/
+.idea/
+Icon?
+_notes/
+tmp/
+profile
