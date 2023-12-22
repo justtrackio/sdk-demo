@@ -24,7 +24,6 @@ Pods/
 # Various settings
 *.swp
 *.lock
-*.DS_Store
 *.plist
 
 # Other files and folders
