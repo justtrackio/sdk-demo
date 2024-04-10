@@ -1,5 +1,3 @@
-import org.gradle.internal.impldep.com.amazonaws.PredefinedClientConfigurations.defaultConfig
-
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
@@ -10,6 +8,7 @@ android {
 
     defaultConfig {
         namespace = "io.justtrack.demo"
+        applicationId = "io.justtrack.demo"
         minSdk = 24
         targetSdk = 33
         versionCode = 1
@@ -44,7 +43,7 @@ dependencies {
     implementation("com.google.android.material:material:1.9.0")
 
     // justtrack-sdk
-    implementation("io.justtrack:justtrack-android-sdk:4.5.0")
+    implementation("io.justtrack:justtrack-android-sdk:4.5.2")
 
     // coroutine-sdk
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")

@@ -27,6 +27,6 @@ And
 
 ```groovy
 dependencies {
-    implementation("io.justtrack:justtrack-android-sdk:4.5.0")
+    implementation("io.justtrack:justtrack-android-sdk:4.5.2")
 }
 ```

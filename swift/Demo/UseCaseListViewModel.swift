@@ -165,11 +165,16 @@ final class UseCaseListViewModel: ObservableObject {
                 onTry: { [weak self, sdk] in
                     self?.isTrying = true
 
-                    let advertiserIdInfo = sdk.advertiserIdInfo
-                    let advertiserId = advertiserIdInfo.advertiserId
-                    let limitedAdTracking = advertiserIdInfo.limitedAdTracking
-
-                    self?.displayAlert(title: "Success", message: "The advertiser identifier is \(advertiserId ?? "nil") and the limited ad tracking status is \(limitedAdTracking).")
+                    sdk.getAdvertiserIdInfo().observe { result in
+                        switch result {
+                        case let .success(info):
+                            let advertiserId = info.advertiserId
+                            let limitedAdTracking = info.limitedAdTracking
+                            self?.displayAlert(title: "Success", message: "The advertiser identifier is \(advertiserId ?? "nil") and the limited ad tracking status is \(limitedAdTracking).")
+                        case let .failure(error):
+                            self?.displayAlert(title: "Failure", message: error.localizedDescription)
+                        }
+                    }
                 }
             ),
             UseCase(

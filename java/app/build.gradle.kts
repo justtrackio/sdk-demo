@@ -8,6 +8,7 @@ android {
 
     defaultConfig {
         namespace = "io.justtrack.demo"
+        applicationId = "io.justtrack.demo"
         minSdk = 24
         targetSdk = 33
         versionCode = 1
@@ -42,7 +43,7 @@ dependencies {
     implementation("com.google.android.material:material:1.9.0")
 
     // justtrack-sdk
-    implementation("io.justtrack:justtrack-android-sdk:4.5.0")
+    implementation("io.justtrack:justtrack-android-sdk:4.5.2")
 
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")

@@ -16,9 +16,7 @@ struct UseCaseListView: View {
 
                     Spacer()
 
-                    Button(action: {
-                        useCase.onTry()
-                    }) {
+                    Button(action: useCase.onTry) {
                         Text("Try")
                             .font(.system(size: 14, weight: .bold))
                             .foregroundColor(.white)
