@@ -1,12 +1,11 @@
-import React, { useState, useRef, useEffect } from 'react';
-import type {PropsWithChildren} from 'react';
+import  { useState, useEffect, ReactNode } from 'react';
 import * as JustTrackSdk from 'react-native-justtrack-sdk';
 import { JtAdClickEvent, UserIdSource, UserEvent } from 'react-native-justtrack-sdk';
 
-import {Button,SafeAreaView,ScrollView,StyleSheet,Text,View} from 'react-native';
+import {Button,ScrollView,StyleSheet,Text,View} from 'react-native';
 
 
-function App(): JSX.Element {
+function App(): ReactNode {
   const [sdkInitalized, setSdkInitialized] = useState(false);
 
   const [mUserId, setUserId] = useState<string>("");
@@ -15,22 +14,18 @@ function App(): JSX.Element {
   const [mAdvertiserIdLimit, setAdvertiserIdLimit] = useState<string>("");
   const [mTestGroupId, setTestGroupId] = useState<string>("");
 
-  const backgroundStyle = {
-    
-  };
-
   useEffect(() => {
     const initializeSDK = async () => {
-      const sdkParameters: JustTrackSdk.JustTrackSdkParameters = {
-        inactivityTimeFrame: -1,
-        reAttributionTimeFrame: 1,
-        reFetchReAttributionDelaySeconds: -3,
-        automaticInAppPurchaseTracking: false,
-        customUserId: "your-custom-user-id",
-        enableFirebaseIntegration: false,
-      };
 
-      await JustTrackSdk.init('your token', sdkParameters);
+      await new JustTrackSdk.JusttrackSdkBuilder('your_token')
+      .withInactivityTimeFrameHours(-1)
+      .withReAttributionTimeFrameDays(1)
+      .withReFetchReAttributionDelaySeconds(-3)
+      .withAutomaticInAppPurchaseTracking(true)
+      .withCustomUserId("your-custom-user-id")
+      .withEnableFirebaseIntegration(false)
+      .initialize();
+      
       setSdkInitialized(true);
     };
 
@@ -124,14 +119,22 @@ function App(): JSX.Element {
       console.log({ message: 'integrateWIthIronSource', error });
     }
   };
+  const styles = StyleSheet.create({
+    backgroundStyle: {
+      backgroundColor: 'white'
+    },
+    sectionContainer: {
+      marginTop: 24,
+      paddingHorizontal: 16,
+    }
+  });
 
   return (
-    <SafeAreaView style={backgroundStyle}>
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={backgroundStyle}>
-        {sdkInitalized ? (
-          <View>
+    <ScrollView
+      style={styles.backgroundStyle}
+      contentInsetAdjustmentBehavior="automatic">
+      {sdkInitalized ? (
+        <View>
           <Text style={styles.sectionContainer}>User Id: {mUserId}</Text>
           <Text style={styles.sectionContainer}>Campaign Id: {mCampaignId}</Text>
           <Text style={styles.sectionContainer}>Advertiser Id: {mAdvertiserId}</Text>
@@ -139,51 +142,42 @@ function App(): JSX.Element {
           <Text style={styles.sectionContainer}>Test Group Id: {mTestGroupId}</Text>
 
           <View style={styles.sectionContainer}>
-          <Button title='Get Attribution' onPress= {getAttribution}></Button>
+            <Button title='Get Attribution' onPress= {getAttribution}></Button>
           </View>
 
           <View style={styles.sectionContainer}>
-          <Button title='Get Advertiser Id' onPress= {() => getAdvertiserIdInfo()}></Button>
+            <Button title='Get Advertiser Id' onPress= {() => getAdvertiserIdInfo()}></Button>
           </View>
 
           <View style={styles.sectionContainer}>
-          <Button title='Get TestGroup Id' onPress= {() => getTestGroupId()}></Button>
+            <Button title='Get TestGroup Id' onPress= {() => getTestGroupId()}></Button>
           </View>
 
           <View style={styles.sectionContainer}>
-          <Button title='Send Ads Impression' onPress= {() => forwardAdImpression()}></Button>
+            <Button title='Send Ads Impression' onPress= {() => forwardAdImpression()}></Button>
           </View>
 
           <View style={styles.sectionContainer}>
-          <Button title='Send Custom Event' onPress= {() => sendCustomEvent()}></Button>
+            <Button title='Send Custom Event' onPress= {() => sendCustomEvent()}></Button>
           </View>
 
           <View style={styles.sectionContainer}>
-          <Button title='Send Predefined Event' onPress= {() => sendPredefinedEvent()}></Button>
+            <Button title='Send Predefined Event' onPress= {() => sendPredefinedEvent()}></Button>
           </View>
 
           <View style={styles.sectionContainer}>
-          <Button title='Send Custom User Id' onPress= {() => sendCustomUserId()}></Button>
+            <Button title='Send Custom User Id' onPress= {() => sendCustomUserId()}></Button>
           </View>
 
           <View style={styles.sectionContainer}>
-          <Button title='Integrate with Ironsouce' onPress= {() => integrateWIthIronSource()}></Button>
+            <Button title='Integrate with Ironsouce' onPress= {() => integrateWIthIronSource()}></Button>
           </View>
         </View>
-        ) : (
-          <Text>Loading...</Text>
-        )}
-
-      </ScrollView>
-    </SafeAreaView>
+      ) : (
+        <Text>Loading...</Text>
+      )}
+    </ScrollView>
   );
 }
-
-const styles = StyleSheet.create({
-  sectionContainer: {
-    marginTop: 24,
-    paddingHorizontal: 16,
-  }
-});
 
 export default App;
