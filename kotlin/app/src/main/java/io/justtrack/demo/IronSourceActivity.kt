@@ -12,16 +12,18 @@ import io.justtrack.UserIdSource
  */
 class IronSourceActivity : Activity() {
     @Suppress("RedundantNullableReturnType")
-    private val customUserId: String? = "..your user id"
+    private val ironSourceUserId: String? = "..your iron source user id"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_ironsource)
 
-        val builder: SdkBuilder = JustTrackSdkBuilder(this, MainActivity.token)
-        if (customUserId != null) {
+        val builder: SdkBuilder = JustTrackSdkBuilder(this, MainActivity.TOKEN)
+            .setUserId("unique_user_id")
+
+        if (ironSourceUserId != null) {
             // or, if you want to provide your own user id:
-            builder.setEnableIronSourceIntegration(true, customUserId)
+            builder.setEnableIronSourceIntegration(true, ironSourceUserId)
         } else {
             builder.setEnableIronSourceIntegration(true, UserIdSource.JustTrack)
         }
@@ -33,12 +35,12 @@ class IronSourceActivity : Activity() {
      * you can integrate IronSource by using "integrateIronSource" after creating the SDK.
      */
     private suspend fun integrateIronSource(sdk: JustTrackSdk) {
-        if (customUserId == null) {
+        if (ironSourceUserId == null) {
             val integrationFuture = sdk.integrateWithIronSource(UserIdSource.JustTrack)
             // if you need to know whether the integration succeeded and is done:
             integrationFuture.await()
         } else {
-            sdk.integrateWithIronSource(customUserId)
+            sdk.integrateWithIronSource(ironSourceUserId)
         }
         // if no exception is thrown, the integration was successful
     }

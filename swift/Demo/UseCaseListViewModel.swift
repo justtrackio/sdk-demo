@@ -15,16 +15,63 @@ final class UseCaseListViewModel: ObservableObject {
     init() {
         sdk = try! JustTrackSdkBuilder(
             apiToken: "your_api_token"
-        ).build()
+        )
+        .set(manualStart: true)
+        .build()
 
-        useCases = [
+        generateUseCases()
+    }
+
+    private func generateUseCases() {
+        useCases =
+        {
+            if sdk.isRunning() {
+                [
+                    UseCase(
+                        name: "Stop the SDK",
+                        description: "Stop the SDK to prevent tracking the user and sending any user data to the justtrack servers.",
+                        onTry: { [weak self, sdk] in
+                            sdk.stop()
+                            self?.generateUseCases()
+                        }
+                    )
+                ]
+            } else {
+                [
+                    UseCase(
+                        name: "Start the SDK",
+                        description: "Start the SDK to make it operational. You can only call most of the SDK methods after it's started.",
+                        onTry: { [weak self, sdk] in
+                            sdk.start()
+                            self?.generateUseCases()
+                        }
+                    )
+                ]
+            }
+        }()
+        +
+        [
+            UseCase(
+                name: "Anonymize user installs, events, and sessions",
+                description: "By calling the anonymize() method, you can instruct the justtrack backend to delete identifying information about the user.",
+                onTry: { [weak self, sdk] in
+                    sdk.anonymize().observe { result in
+                        switch result {
+                        case .success:
+                            self?.displayAlert(title: "Success", message: "The user data has been successfully anonymized.")
+                        case let .failure(error):
+                            self?.displayAlert(title: "Error", message: error.localizedDescription)
+                        }
+                    }
+                }
+            ),
             UseCase(
                 name: "Publish a user event with a name, value, and unit",
                 description: "You can instantiate a UserEvent with a name, value, and unit. The value can be any number, and the unit can be either count, milliseconds, or seconds.",
                 onTry: { [weak self, sdk] in
                     self?.isTrying = true
 
-                    let event = UserEvent(
+                    let event = AppEvent(
                         name: "value_unit_event",
                         value: 100,
                         unit: .count
@@ -54,7 +101,7 @@ final class UseCaseListViewModel: ObservableObject {
                 onTry: { [weak self, sdk] in
                     self?.isTrying = true
 
-                    let event = UserEvent(
+                    let event = AppEvent(
                         name: "money_event",
                         money: Money(value: 100, currency: "EUR")
                     )
@@ -75,7 +122,7 @@ final class UseCaseListViewModel: ObservableObject {
                 onTry: { [weak self, sdk] in
                     self?.isTrying = true
 
-                    let event = UserEvent(
+                    let event = AppEvent(
                         name: "money_event",
                         money: Money(value: 100, currency: "EUR")
                     )
@@ -94,11 +141,11 @@ final class UseCaseListViewModel: ObservableObject {
             ),
             UseCase(
                 name: "Publish a predefined event",
-                description: "You can also send a predefined event. The SDK provides a list of predefined events, which you can find in the documentation." /* at https://docs.justtrack.io/sdk/predefined-events */,
+                description: "You can also send a predefined event. The SDK provides a list of predefined events, which you can find in the documentation." /* at https://docs.justtrack.io/sdk/5.0.x/overview/predefined-events */,
                 onTry: { [weak self, sdk] in
                     self?.isTrying = true
 
-                    let event = JtScreenShowEvent(jtElementName: "screen_header")
+                    let event = JtLoginEvent(jtAction: "login")
 
                     sdk.publish(event: event).observe { result in
                         switch result {
@@ -112,13 +159,13 @@ final class UseCaseListViewModel: ObservableObject {
             ),
             UseCase(
                 name: "Set a custom user identifier",
-                description: "You can set a custom user ID to use it instead of the one provided by the SDK.",
+                description: "You can set your own user ID to use it instead of the one provided by the SDK.",
                 onTry: { [weak self, sdk] in
                     self?.isTrying = true
 
                     let userId = "custom_user_id"
 
-                    sdk.set(customUserId: userId).observe { result in
+                    sdk.set(userId: userId).observe { result in
                         switch result {
                         case .success:
                             self?.displayAlert(title: "Success", message: "The user identifier was successfully set.")
@@ -150,9 +197,9 @@ final class UseCaseListViewModel: ObservableObject {
                     sdk.attribution.observe { result in
                         switch result {
                         case let .success(attributionResponse):
-                            let userId = attributionResponse.userId
+                            let justtrackUserId = attributionResponse.justtrackUserId
                             let campaign = attributionResponse.campaign
-                            self?.displayAlert(title: "Success", message: "The user identifier is \(userId) and the campaign is \(campaign).")
+                            self?.displayAlert(title: "Success", message: "The user identifier is \(justtrackUserId) and the campaign is \(campaign).")
                         case let .failure(error):
                             self?.displayAlert(title: "Error", message: error.localizedDescription)
                         }
@@ -183,7 +230,7 @@ final class UseCaseListViewModel: ObservableObject {
                 onTry: { [weak self, sdk] in
                     self?.isTrying = true
 
-                    let adImpression = AdImpression(format: "impression_format", sdkName: "sdk_name")
+                    let adImpression = AdImpression(unit: "impression_unit", sdkName: "sdk_name")
                         .set(bundleId: "bundle_id")
                         .set(instanceName: "instance_name")
                         .set(network: "network")
@@ -192,9 +239,12 @@ final class UseCaseListViewModel: ObservableObject {
                         .set(segmentName: "segment_name")
                         .set(testGroup: "test_group")
 
-                    let success = sdk.forward(adImpression: adImpression)
-
-                    self?.displayAlert(title: "\(success ? "Success" : "Failure")", message: "The ad impression \(success ? "was" : "wasn't") forwarded.")
+                    switch sdk.forward(adImpression: adImpression) {
+                    case .success:
+                        self?.displayAlert(title: "Success", message: "The ad impression was forwarded.")
+                    case let .failure(error):
+                        self?.displayAlert(title: "Failure", message: "The ad impression wasn't forwarded. Error: \(error.localizedDescription)")
+                    }
                 }
             ),
         ]

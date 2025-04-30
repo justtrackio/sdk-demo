@@ -1,24 +1,24 @@
 package io.justtrack.demo
 
 import android.app.Activity
-import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
-import io.justtrack.AdFormat
 import io.justtrack.AdImpression
-import io.justtrack.JtScreenShowEvent
+import io.justtrack.AdUnit
+import io.justtrack.AppEvent
+import io.justtrack.Callback
+import io.justtrack.JtLoginEvent
 import io.justtrack.JustTrackSdk
 import io.justtrack.JustTrackSdkBuilder
 import io.justtrack.Money
-import io.justtrack.UserEvent
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+
 
 class MainActivity : Activity() {
     private lateinit var sdk: JustTrackSdk
@@ -26,72 +26,99 @@ class MainActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        //initialize the justtrack SDK
-        sdk = JustTrackSdkBuilder(this, token).build()
+        val intent = intent
+
+        val builder = JustTrackSdkBuilder(this, TOKEN)
+
+        builder.setManualStart(intent.getBooleanExtra("isManualStart", false))
+
+        if (intent.hasExtra("userId")) {
+            val userIdExtra = intent.getStringExtra("userId")
+
+            if (userIdExtra != null) {
+                builder.setUserId(userIdExtra)
+            }
+        }
+
+        // initialize the justtrack SDK
+        sdk = builder.build()
     }
+
+    /**
+     * The SDK starts tracking the user only after the start method is called.
+     * User's unique IDs, install and app events will only be tracked after the method is used.
+     * Any event preceding the start call will not be reported by the SDK.
+     */
+    fun start(view: View?) {
+        sdk.start()
+    }
+
+    /**
+     * The SDK stops tracking the user entirely.
+     * No ID's or app events will be tracked or reported.
+     * Any app events collected before the stop method is called will still be reported.
+     */
+    fun stop(view: View?) {
+        sdk.stop()
+    }
+
 
     /**
      * We offer a range of predefined events, which you can find listed at io.justtrack.UserEvent.
      * For detailed descriptions of each event, please refer to our documentation at
      * https://docs.justtrack.io/sdk/predefined-events.
      */
-    fun sendPredefinedEvent(@Suppress("UNUSED_PARAMETER") view: View) {
+    fun sendPredefinedEvent(view: View) {
         sdk.publishEvent(
-            JtScreenShowEvent("Main").apply {
-                // You can add up to 10 dimensions per event. The constructor already set the "jt_element_name"
+            JtLoginEvent("success", "facebook") // You can add up to 10 dimensions per event. The constructor already set the "jt_element_name"
                 // dimension, so you have 9 dimensions you can specify left.
-                addDimension("stage", "1")
-                addDimension("character", "fighter")
-                addDimension("dim", "value")
+                .addDimension("id", "1")
+                .addDimension("dim", "value")
+        ).registerCallback(object : Callback<Void?> {
+            override fun resolve(unused: Void?) {
+                displayToast("predefined event sent")
             }
-        )
+
+            override fun reject(throwable: Throwable) {
+                log(throwable)
+            }
+        })
     }
 
     /**
      * Here is how you can send your custom event.
      */
-    fun sendCustomEvent(@Suppress("UNUSED_PARAMETER") view: View) {
-        sdk.publishEvent(UserEvent("screen_view_event").apply {
-            // You can add up to 10 dimensions to one event.
-            addDimension("stage", "1")
-            addDimension("character", "fighter")
-            addDimension("dim", "value")
+    fun sendCustomEvent(view: View) {
+        sdk.publishEvent(
+            AppEvent("screen_view_event") // You can add up to 10 dimensions to one event.
+                .addDimension("stage", "1")
+                .addDimension("character", "fighter")
+                .addDimension("dim", "value")
+        ).registerCallback(object : Callback<Void?> {
+            override fun resolve(unused: Void?) {
+                displayToast("custom event sent")
+            }
+
+            override fun reject(throwable: Throwable) {
+                log(throwable)
+            }
         })
     }
 
-    fun forwardAdImpression(@Suppress("UNUSED_PARAMETER") view: View) {
+    fun forwardAdImpression(view: View) {
         sdk.forwardAdImpression(
-            AdImpression(AdFormat.Banner, "adSdkName").apply {
-                setNetwork("network")
-                setPlacement("placement")
-                setTestGroup("testGroup")
-                setSegmentName("segmentName")
-                setInstanceName("instanceName")
-                setBundleId("bundle.id")
-                setRevenue(Money(10.0, "USD"))
-            }
+            AdImpression(AdUnit.Banner, "adSdkName")
+                .setNetwork("network")
+                .setPlacement("placement")
+                .setTestGroup("testGroup")
+                .setSegmentName("segmentName")
+                .setInstanceName("instanceName")
+                .setBundleId("bundle.id")
+                .setRevenue(Money(10.0, "USD"))
         )
     }
 
-    /**
-     * If you already have your own assigned unique ID for the user,
-     * you can also send us this custom unique ID and we will link it with the user.
-     */
-    fun sendCustomUserId(@Suppress("UNUSED_PARAMETER") view: View) {
-        AlertDialog.Builder(this).apply {
-            title = "Send Custom User Id"
-            val input = EditText(this@MainActivity)
-            setView(input)
-            setPositiveButton(
-                "Add"
-            ) { _, _ ->
-                val customUserId = input.text.toString()
-                sdk.setCustomUserId(customUserId)
-            }
-        }.create().show()
-    }
-
-    fun getAdvertiserId(@Suppress("UNUSED_PARAMETER") view: View) {
+    fun getAdvertiserId(view: View) {
         CoroutineScope(Dispatchers.Main).launch {
             try {
                 val advertiserIdInfo = sdk.advertiserIdInfo.await()
@@ -111,13 +138,10 @@ class MainActivity : Activity() {
         }
     }
 
-    fun getAttribution(@Suppress("UNUSED_PARAMETER") view: View) {
+    fun getAttribution(view: View) {
         CoroutineScope(Dispatchers.Main).launch {
             try {
                 val response = sdk.attribution.await()
-                val userId = response.userId.toString()
-                findViewById<TextView>(R.id.userIdTextView).text =
-                    getString(R.string.user_id, userId)
 
                 val campaignName = response.campaign.name
                 findViewById<TextView>(R.id.campaignTextView).text = getString(
@@ -130,7 +154,21 @@ class MainActivity : Activity() {
         }
     }
 
-    fun getTestGroupId(@Suppress("UNUSED_PARAMETER") view: View) {
+    fun getInstallId(view: View) {
+        CoroutineScope(Dispatchers.Main).launch {
+            try {
+                val installInstanceId = sdk.installInstanceId.await()
+                findViewById<TextView>(R.id.InstallIdTextView).text = getString(
+                    R.string.install_id_value,
+                    installInstanceId
+                )
+            } catch (throwable: Throwable) {
+                log(throwable)
+            }
+        }
+    }
+
+    fun getTestGroupId(view: View) {
         CoroutineScope(Dispatchers.Main).launch {
             try {
                 val testGroupId: Int? = sdk.testGroupId.await()
@@ -175,10 +213,20 @@ class MainActivity : Activity() {
         Log.e(TAG, "Got unexpected error", throwable)
     }
 
+    private fun displayToast(message: String) {
+        runOnUiThread {
+            Toast.makeText(
+                this@MainActivity,
+                message,
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+    }
+
     companion object {
         const val TAG = "Demo"
 
-        //this token is generated in your application dashboard
-        const val token = "..your token.."
+        // this token is generated in your application dashboard
+        const val TOKEN = ""
     }
 }

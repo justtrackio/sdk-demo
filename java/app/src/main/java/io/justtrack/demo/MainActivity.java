@@ -1,43 +1,73 @@
 package io.justtrack.demo;
 
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import io.justtrack.AdFormat;
 import io.justtrack.AdImpression;
+import io.justtrack.AdUnit;
 import io.justtrack.AdvertiserIdInfo;
-import io.justtrack.AttributionResponse;
-import io.justtrack.JtScreenShowEvent;
+import io.justtrack.AppEvent;
+import io.justtrack.Attribution;
+import io.justtrack.Callback;
+import io.justtrack.JtLoginEvent;
 import io.justtrack.JustTrackSdk;
 import io.justtrack.JustTrackSdkBuilder;
 import io.justtrack.Money;
-import io.justtrack.Promise;
-import io.justtrack.UserEvent;
 
 public class MainActivity extends Activity {
     private static final String TAG = "justtrack demo";
 
-    //this token is generated in your application dashboard
-    public static final String token = "..your token..";
+    // this token is generated in your application dashboard
+    public static final String TOKEN = "";
     private JustTrackSdk sdk;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        //initialize the justtrack SDK
-        sdk = new JustTrackSdkBuilder(this, token).build();
+
+        Intent intent = getIntent();
+
+        JustTrackSdkBuilder builder = new JustTrackSdkBuilder(this, TOKEN);
+
+        builder.setManualStart(intent.getBooleanExtra("isManualStart", false));
+
+        if (intent.hasExtra("userId")) {
+            String userIdExtra = intent.getStringExtra("userId");
+
+            if (userIdExtra != null) {
+                builder.setUserId(userIdExtra);
+            }
+        }
+
+        // initialize the justtrack SDK
+        sdk = builder.build();
+    }
+
+    /**
+     * The SDK starts tracking the user only after the start method is called.
+     * User's unique IDs, install and app events will only be tracked after the method is used.
+     * Any event preceding the start call will not be reported by the SDK.
+     */
+    public void start(View view) {
+        sdk.start();
+    }
+
+    /**
+     * The SDK stops tracking the user entirely.
+     * No ID's or app events will be tracked or reported.
+     * Any app events collected before the stop method is called will still be reported.
+     */
+    public void stop(View view) {
+        sdk.stop();
     }
 
     /**
@@ -47,28 +77,48 @@ public class MainActivity extends Activity {
      */
     public void sendPredefinedEvent(View view) {
         sdk.publishEvent(
-                new JtScreenShowEvent("Main")
+                new JtLoginEvent("success", "facebook")
                         // You can add up to 10 dimensions per event. The constructor already set the "jt_element_name"
                         // dimension, so you have 9 dimensions you can specify left.
-                        .addDimension("stage", "1")
-                        .addDimension("character", "fighter")
+                        .addDimension("id", "1")
                         .addDimension("dim", "value")
-        );
+        ).registerCallback(new Callback<Void>() {
+            @Override
+            public void resolve(Void unused) {
+                displayToast("predefined event sent");
+            }
+
+            @Override
+            public void reject(@NonNull Throwable throwable) {
+                log(throwable);
+            }
+        });
     }
 
     /**
      * Here is how you can send your custom event.
      */
     public void sendCustomEvent(View view) {
-        sdk.publishEvent(new UserEvent("screen_view_event")
+        sdk.publishEvent(new AppEvent("screen_view_event")
                 // You can add up to 10 dimensions to one event.
                 .addDimension("stage", "1")
                 .addDimension("character", "fighter")
-                .addDimension("dim", "value"));
+                .addDimension("dim", "value")
+        ).registerCallback(new Callback<Void>() {
+            @Override
+            public void resolve(Void unused) {
+                displayToast("custom event sent");
+            }
+
+            @Override
+            public void reject(@NonNull Throwable throwable) {
+                log(throwable);
+            }
+        });;
     }
 
     public void forwardAdImpression(View view) {
-        sdk.forwardAdImpression(new AdImpression(AdFormat.Banner, "adSdkName")
+        sdk.forwardAdImpression(new AdImpression(AdUnit.Banner, "adSdkName")
                 .setNetwork("network")
                 .setPlacement("placement")
                 .setTestGroup("testGroup")
@@ -79,24 +129,8 @@ public class MainActivity extends Activity {
         );
     }
 
-    /**
-     * If you already have your own assigned unique ID for the user,
-     * you can also send us this custom unique ID and we will link it with the user.
-     */
-    public void sendCustomUserId(View view) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Send Custom User Id");
-        EditText input = new EditText(MainActivity.this);
-        builder.setView(input);
-        builder.setPositiveButton("Add", (dialogInterface, i) -> {
-            String customerUserId = input.getText().toString();
-            sdk.setCustomUserId(customerUserId);
-        });
-        builder.create().show();
-    }
-
     public void getAdvertiserId(View view) {
-        sdk.getAdvertiserIdInfo().registerPromiseCallback(new Promise<AdvertiserIdInfo>() {
+        sdk.getAdvertiserIdInfo().registerCallback(new Callback<AdvertiserIdInfo>() {
             @Override
             public void resolve(AdvertiserIdInfo advertiserIdInfo) {
                 if (advertiserIdInfo != null) {
@@ -121,17 +155,15 @@ public class MainActivity extends Activity {
     }
 
     public void getAttribution(View view) {
-        sdk.getAttribution().registerPromiseCallback(new Promise<AttributionResponse>() {
+        sdk.getAttribution().registerCallback(new Callback<Attribution>() {
             @Override
-            public void resolve(AttributionResponse response) {
-                String userId = response.getUserId().toString();
-                changeText(findViewById(R.id.userIdTextView), getString(R.string.user_id, userId));
-
+            public void resolve(Attribution response) {
                 String campaignName = response.getCampaign().getName();
                 changeText(findViewById(R.id.campaignTextView), getString(
                         R.string.campaign_name,
                         campaignName
                 ));
+
             }
 
             @Override
@@ -141,8 +173,27 @@ public class MainActivity extends Activity {
         });
     }
 
+    public void getInstallId(View view) {
+        sdk.getInstallInstanceId().registerCallback(new Callback<String>() {
+            @Override
+            public void resolve(String s) {
+                changeText(findViewById(R.id.InstallIdTextView), getString(
+                        R.string.install_id_value,
+                        s
+                ));
+
+            }
+
+            @Override
+            public void reject(@NonNull Throwable throwable) {
+                log(throwable);
+            }
+        });
+    }
+
+
     public void getTestGroupId(View view) {
-        sdk.getTestGroupId().registerPromiseCallback(new Promise<Integer>() {
+        sdk.getTestGroupId().registerCallback(new Callback<Integer>() {
             @Override
             public void resolve(Integer testGroupId) {
                 if (testGroupId != null) {
@@ -159,6 +210,7 @@ public class MainActivity extends Activity {
             }
         });
     }
+
 
     @Override
     protected void onDestroy() {
@@ -190,6 +242,14 @@ public class MainActivity extends Activity {
                 Toast.LENGTH_SHORT
         ).show());
         Log.e(TAG, "Got unexpected error", throwable);
+    }
+
+    private void displayToast(String message) {
+        runOnUiThread(() -> Toast.makeText(
+                MainActivity.this,
+                message,
+                Toast.LENGTH_SHORT
+        ).show());
     }
 
     private void changeText(TextView textView, String text) {

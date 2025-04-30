@@ -7,13 +7,13 @@
     tools:context=".MainActivity">
 
     <TextView
-        android:id="@+id/userIdTextView"
+        android:id="@+id/InstallIdTextView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="24dp"
         android:layout_marginEnd="24dp"
-        android:text="User Id: "
+        android:text="@string/install_id"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -28,7 +28,7 @@
         android:text="Campaign: "
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/userIdTextView" />
+        app:layout_constraintTop_toBottomOf="@+id/InstallIdTextView" />
 
     <TextView
         android:id="@+id/advertiserIdTextView"
@@ -89,25 +89,15 @@
         app:layout_constraintStart_toEndOf="@+id/getAttributionButton" />
 
     <Button
-        android:id="@+id/sendCustomUserIdButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginBottom="8dp"
-        android:onClick="sendCustomUserId"
-        android:text="@string/send_custom_user_id"
-        app:layout_constraintBottom_toTopOf="@+id/getAttributionButton"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <Button
         android:id="@+id/getTestGroupId"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
+        android:layout_marginBottom="8dp"
         android:onClick="getTestGroupId"
         android:text="@string/get_test_group_id"
-        app:layout_constraintBottom_toBottomOf="@+id/sendCustomUserIdButton"
-        app:layout_constraintLeft_toRightOf="@+id/sendCustomUserIdButton" />
+        app:layout_constraintBottom_toTopOf="@id/getAttributionButton"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <Button
         android:id="@+id/sendPredefinedEvent"
@@ -117,7 +107,7 @@
         android:layout_marginBottom="8dp"
         android:onClick="sendPredefinedEvent"
         android:text="@string/send_predefined_event"
-        app:layout_constraintBottom_toTopOf="@+id/sendCustomUserIdButton"
+        app:layout_constraintBottom_toTopOf="@+id/getTestGroupId"
         app:layout_constraintStart_toStartOf="parent" />
 
     <Button
@@ -140,4 +130,37 @@
         android:text="@string/ad_impression"
         app:layout_constraintBottom_toBottomOf="@+id/sendCustomEvent"
         app:layout_constraintStart_toEndOf="@+id/sendCustomEvent" />
+
+    <Button
+        android:id="@+id/startButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:text="@string/start"
+        android:onClick="start"
+        app:layout_constraintBottom_toTopOf="@+id/sendCustomEvent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <Button
+        android:id="@+id/stopButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:text="@string/stop"
+        android:onClick="stop"
+        app:layout_constraintBottom_toBottomOf="@+id/startButton"
+        app:layout_constraintStart_toEndOf="@+id/startButton" />
+
+    <Button
+        android:id="@+id/installIdButton"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:onClick="getInstallId"
+        android:text="@string/get_install_id"
+        app:layout_constraintBottom_toBottomOf="@+id/getTestGroupId"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/getTestGroupId" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

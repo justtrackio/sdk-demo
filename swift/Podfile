@@ -1,4 +1,4 @@
 target 'Demo' do
   use_frameworks!
-  pod 'JustTrackSDK', '4.5.2'
+  pod 'JustTrackSDK', '5.0.0'
 end

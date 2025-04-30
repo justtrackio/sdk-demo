@@ -15,15 +15,16 @@ import io.justtrack.UserIdSource;
 
 /** @noinspection ConstantValue*/
 public class IronSourceActivity extends Activity {
-    public final String customUserId = "..your user id";
+    public final String ironSourceUserId = "..your user id";
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ironsource);
-        SdkBuilder builder = new JustTrackSdkBuilder(this, MainActivity.token);
-        if (customUserId != null) {
-            builder.setEnableIronSourceIntegration(true, customUserId);
+        SdkBuilder builder = new JustTrackSdkBuilder(this, MainActivity.TOKEN)
+                .setUserId("unique_user_id");
+        if (ironSourceUserId != null) {
+            builder.setEnableIronSourceIntegration(true, ironSourceUserId);
         } else {
             builder.setEnableIronSourceIntegration(true, UserIdSource.JustTrack);
         }
@@ -38,12 +39,12 @@ public class IronSourceActivity extends Activity {
      * @noinspection unused
      */
     private void integrateIronSource(JustTrackSdk sdk) throws ExecutionException, InterruptedException {
-        if (customUserId == null) {
+        if (ironSourceUserId == null) {
             Future<Void> integrationFuture = sdk.integrateWithIronSource(UserIdSource.JustTrack);
             // if you need to know whether the integration succeeded and is done:
             integrationFuture.get();
         } else {
-            sdk.integrateWithIronSource(customUserId);
+            sdk.integrateWithIronSource(ironSourceUserId);
         }
         // if no exception is thrown, the integration was successful
     }

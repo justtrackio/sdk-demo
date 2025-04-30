@@ -1,9 +1,21 @@
 <resources>
     <string name="app_name">justtrack Demo</string>
+
+    <string name="setup_title">Setup</string>
+    <string name="setup_start_description">By default Manual Start is toggled off, this allows the justtrack SDK to called sdk.start() automatically right after SDK initialize. If you wish to toggle this on please called sdk.start() manually as well.</string>
+    <string name="setup_toggle_manual_start">Manual Start</string>
+    <string name="setup_user_id_description">If you already have a mechanism to assign a unique ID to each user, you can share this information with the justtrack SDK. This then allows the backend of the justtrack SDK to associate events received from third parties via that user ID with the correct user on justtrack side</string>
+    <string name="setup_user_id_random">Random</string>
+    <string name="setup_user_id_hint">User ID</string>
+    <string name="setup_start">Start</string>
+
+
     <string name="get_user_id">Get Attribution</string>
     <string name="get_advertiser_id">Get Advertiser Info</string>
     <string name="get_test_group_id">Get Test Group Id</string>
     <string name="user_id">User Id: %1$s</string>
+    <string name="install_id">Install Id:</string>
+    <string name="install_id_value">Install Id: %1$s</string>
     <string name="campaign_name">Campaign: %1$s</string>
     <string name="advertiser_id">Advertiser Id: %1$s</string>
     <string name="tracking_limit">Tracking Limit: %1$s</string>
@@ -12,4 +24,7 @@
     <string name="send_predefined_event">Send Predefined Event</string>
     <string name="send_custom_event">Send Custom Event</string>
     <string name="ad_impression">Ad Impression</string>
+    <string name="start">Start</string>
+    <string name="stop">Stop</string>
+    <string name="get_install_id">Get Install Id</string>
 </resources>

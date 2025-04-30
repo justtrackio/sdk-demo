@@ -1,0 +1,54 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1af9264a50d2d182d83b6ed47c4d7a27, type: 3}
+  m_Name: JustTrackSettings
+  m_EditorClassIdentifier: 
+  manualStart: 0
+  alwaysUpdateInjectedCode: 0
+  ignoreFirebaseIntegration: 0
+  androidApiToken: 
+  iosApiToken: 
+  androidAdColonyIntegration: 0
+  iosAdColonyIntegration: 0
+  androidAppLovinIntegration: 0
+  androidAppLovinIntegrationListenForRevenue: 0
+  iosAppLovinIntegration: 0
+  iosAppLovinIntegrationListenForRevenue: 0
+  androidChartboostIntegration: 0
+  iosChartboostIntegration: 0
+  androidUnityAdsIntegration: 0
+  iosUnityAdsIntegration: 0
+  androidIronSourceSettings:
+    appKey: 
+    enableBanner: 0
+    enableInterstitial: 0
+    enableRewardedVideo: 0
+    enableOfferwall: 0
+  iosIronSourceSettings:
+    appKey: 
+    enableBanner: 0
+    enableInterstitial: 0
+    enableRewardedVideo: 0
+    enableOfferwall: 0
+  iosTrackingSettings:
+    requestTrackingPermission: 0
+    useCustomAdvertisingAttributionReportEndpoint: 0
+    trackingPermissionDescription: 
+    trackingPermissionDescriptionManaged: 0
+    facebookAudienceNetworkIntegration: 0
+  androidFirebaseSettings:
+    enableAutomaticIntegration: 0
+  iosDisableAutomaticInAppPurchaseTracking: 0
+  androidDisableAutomaticInAppPurchaseTracking: 0
+  iosFirebaseSettings:
+    enableAutomaticIntegration: 0
+  enableDebugMode: 0

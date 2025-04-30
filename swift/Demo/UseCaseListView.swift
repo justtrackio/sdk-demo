@@ -5,27 +5,31 @@ struct UseCaseListView: View {
 
     var body: some View {
         NavigationView {
-            List(viewModel.useCases, id: \.name) { useCase in
-                HStack {
-                    VStack(alignment: .leading) {
-                        Text(useCase.name)
-                            .font(.headline)
-                        Text(useCase.description)
-                            .font(.subheadline)
-                    }
+            List {
+                ForEach(viewModel.useCases, id: \.name) { useCase in
+                    HStack {
+                        VStack(alignment: .leading) {
+                            Text(useCase.name)
+                                .font(.headline)
+                            Text(useCase.description)
+                                .font(.subheadline)
+                        }
 
-                    Spacer()
+                        Spacer()
 
-                    Button(action: useCase.onTry) {
-                        Text("Try")
-                            .font(.system(size: 14, weight: .bold))
-                            .foregroundColor(.white)
-                            .padding()
-                            .background(.blue)
-                            .cornerRadius(10)
+                        Button(action: useCase.onTry) {
+                            Text("Try")
+                                .font(.system(size: 14, weight: .bold))
+                                .foregroundColor(.white)
+                                .padding()
+                                .background(.blue)
+                                .cornerRadius(10)
+                        }
                     }
                 }
             }
+            .listStyle(PlainListStyle())
+            .buttonStyle(BorderlessButtonStyle())
             .navigationBarTitle("Use Cases")
         }
         .overlay(

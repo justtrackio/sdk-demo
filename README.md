@@ -8,3 +8,4 @@ Take a look at the demo application for your platform:
 - [Android - Kotlin](https://github.com/justtrackio/sdk-demo/tree/main/kotlin)
 - [iOS - Swift](https://github.com/justtrackio/sdk-demo/tree/main/swift)
 - [ReactNative](https://github.com/justtrackio/sdk-demo/tree/main/react-native)
+- [Unity](https://github.com/justtrackio/sdk-demo/tree/main/unity)
